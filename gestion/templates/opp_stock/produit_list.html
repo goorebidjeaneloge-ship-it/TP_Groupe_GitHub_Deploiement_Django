@@ -1,0 +1,94 @@
+{% extends "opp_stock/base.html" %}
+
+{% block title %}
+  {% if categorie_active %}{{ categorie_active.nom }}{% else %}Produits{% endif %} — Gestion de stock
+{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>
+        {% if categorie_active %}
+          {{ categorie_active.nom }}
+        {% else %}
+          Produits en stock
+        {% endif %}
+      </h1>
+      <p class="subtitle">
+        {{ produits|length }} produit{{ produits|length|pluralize }} affiché{{ produits|length|pluralize }}
+        {% if nombre_alertes %}
+          · <a href="{% url 'opp_stock:alertes_stock' %}">{{ nombre_alertes }} en alerte de stock</a>
+        {% endif %}
+      </p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'opp_stock:ajouter_produit' %}">+ Nouveau produit</a>
+  </div>
+
+  <form class="filter-bar" method="get">
+    <label for="filtre-categorie" class="stat">Filtrer par catégorie</label>
+    <select id="filtre-categorie" name="categorie" onchange="this.form.submit()">
+      <option value="">Toutes les catégories</option>
+      {% for categorie in categories %}
+        <option value="{{ categorie.pk }}"
+          {% if categorie_selectionnee == categorie.pk %}selected{% endif %}>{{ categorie.nom }}</option>
+      {% endfor %}
+    </select>
+    <noscript><button class="btn" type="submit">Filtrer</button></noscript>
+    {% if categorie_selectionnee %}
+      <a class="btn btn-sm" href="{% url 'opp_stock:liste_produits' %}">Réinitialiser</a>
+    {% endif %}
+  </form>
+
+  <div class="card">
+    {% if produits %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Catégorie</th>
+              <th class="num">Quantité</th>
+              <th class="num">Seuil d'alerte</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for produit in produits %}
+              <tr>
+                <td><strong>{{ produit.nom }}</strong></td>
+                <td>{{ produit.categorie.nom }}</td>
+                <td class="num">{{ produit.quantite }}</td>
+                <td class="num">{{ produit.seuil_alerte }}</td>
+                <td>
+                  {% if produit.en_alerte %}
+                    <span class="badge badge-alert">Stock bas</span>
+                  {% else %}
+                    <span class="badge badge-ok">Disponible</span>
+                  {% endif %}
+                </td>
+                <td class="actions">
+                  <a class="btn btn-sm" href="{% url 'opp_stock:modifier_produit' produit.pk %}">Modifier</a>
+                  <form method="post" action="{% url 'opp_stock:supprimer_produit' produit.pk %}"
+                        onsubmit="return confirm('Supprimer définitivement « {{ produit.nom|escapejs }} » ?');">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-danger" type="submit">Supprimer</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">
+        <strong>Aucun produit{% if categorie_active %} dans « {{ categorie_active.nom }} »{% endif %}.</strong>
+        {% if categorie_selectionnee %}
+          <a href="{% url 'opp_stock:liste_produits' %}">Voir tous les produits</a>
+        {% else %}
+          <a href="{% url 'opp_stock:ajouter_produit' %}">Ajouter le premier produit</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

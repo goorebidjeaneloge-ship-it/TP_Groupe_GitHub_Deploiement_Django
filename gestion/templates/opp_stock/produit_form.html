@@ -1,0 +1,77 @@
+{% extends "opp_stock/base.html" %}
+
+{% block title %}{% if produit %}Modifier {{ produit.nom }}{% else %}Nouveau produit{% endif %} — Gestion de stock{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>{% if produit %}Modifier le produit{% else %}Nouveau produit{% endif %}</h1>
+      <p class="subtitle">
+        {% if produit %}
+          Mise à jour de « {{ produit.nom }} »
+        {% else %}
+          Renseignez les informations du produit à ajouter au stock.
+        {% endif %}
+      </p>
+    </div>
+    <a class="btn" href="{% url 'opp_stock:liste_produits' %}">← Retour à la liste</a>
+  </div>
+
+  {% if erreur %}
+    <ul class="messages"><li class="error">{{ erreur }}</li></ul>
+  {% endif %}
+
+  {% if not categories %}
+    <div class="card empty">
+      <strong>Aucune catégorie enregistrée.</strong>
+      Un produit doit appartenir à une catégorie.
+      <a href="{% url 'admin:gestion_categorie_add' %}">Créer une catégorie dans l'administration</a>
+    </div>
+  {% else %}
+    <div class="card">
+      <form class="form-grid" method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="field">
+          <label for="id_nom">Nom du produit</label>
+          <input type="text" id="id_nom" name="nom" maxlength="150" required
+                 placeholder="Ex. : Riz parfumé 5 kg"
+                 value="{% if donnees %}{{ donnees.nom }}{% elif produit %}{{ produit.nom }}{% endif %}">
+          <span class="help">Au moins 2 caractères.</span>
+        </div>
+
+        <div class="field">
+          <label for="id_categorie">Catégorie</label>
+          <select id="id_categorie" name="categorie" required>
+            <option value="">— Choisir une catégorie —</option>
+            {% for categorie in categories %}
+              <option value="{{ categorie.pk }}"
+                {% if donnees and donnees.categorie == categorie.pk|stringformat:"s" %}selected
+                {% elif produit and produit.categorie_id == categorie.pk %}selected{% endif %}>{{ categorie.nom }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="id_quantite">Quantité en stock</label>
+          <input type="number" id="id_quantite" name="quantite" min="0" step="1" required
+                 value="{% if donnees %}{{ donnees.quantite }}{% elif produit %}{{ produit.quantite }}{% else %}0{% endif %}">
+        </div>
+
+        <div class="field">
+          <label for="id_seuil_alerte">Seuil d'alerte</label>
+          <input type="number" id="id_seuil_alerte" name="seuil_alerte" min="0" step="1" required
+                 value="{% if donnees %}{{ donnees.seuil_alerte }}{% elif produit %}{{ produit.seuil_alerte }}{% else %}5{% endif %}">
+          <span class="help">Le produit est signalé dès que la quantité descend sous ce seuil.</span>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">
+            {% if produit %}Enregistrer les modifications{% else %}Ajouter le produit{% endif %}
+          </button>
+          <a class="btn" href="{% url 'opp_stock:liste_produits' %}">Annuler</a>
+        </div>
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}
