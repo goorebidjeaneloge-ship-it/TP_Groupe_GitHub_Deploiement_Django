@@ -23,10 +23,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY", "cle-de-dev-a-changer")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+def _env_bool(nom, defaut=False):
+    return os.environ.get(nom, str(defaut)).strip().lower() in ("1", "true", "yes", "oui")
+
+
+def _env_liste(nom, defaut=""):
+    return [element.strip() for element in os.environ.get(nom, defaut).split(",") if element.strip()]
+
+
+# En production : DEBUG=False et ALLOWED_HOSTS="mondomaine.com" dans l'environnement.
+DEBUG = _env_bool("DEBUG", True)
+
+ALLOWED_HOSTS = _env_liste("ALLOWED_HOSTS", "127.0.0.1,localhost")
+
+# Render expose automatiquement le domaine public dans cette variable.
+_hote_render = os.environ.get("RENDER_EXTERNAL_HOSTNAME", "").strip()
+if _hote_render:
+    ALLOWED_HOSTS.append(_hote_render)
+
+# Nécessaire sur les hébergeurs HTTPS (Render, Railway…) pour les formulaires POST.
+CSRF_TRUSTED_ORIGINS = _env_liste("CSRF_TRUSTED_ORIGINS", "")
+if _hote_render:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{_hote_render}")
 
 
 # Application definition
@@ -43,6 +62,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -104,9 +124,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'fr-fr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Abidjan'
 
 USE_I18N = True
 
@@ -116,7 +136,24 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+
+# Derrière un proxy HTTPS (Render, Railway, Heroku…)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Email

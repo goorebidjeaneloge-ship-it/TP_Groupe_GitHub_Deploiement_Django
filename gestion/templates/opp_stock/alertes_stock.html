@@ -1,0 +1,58 @@
+{% extends "opp_stock/base.html" %}
+
+{% block title %}Alertes de stock — Gestion de stock{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>Alertes de stock</h1>
+      <p class="subtitle">
+        {% if nombre_alertes %}
+          {{ nombre_alertes }} produit{{ nombre_alertes|pluralize }} sous le seuil d'alerte.
+        {% else %}
+          Aucun produit sous le seuil d'alerte.
+        {% endif %}
+      </p>
+    </div>
+    <a class="btn" href="{% url 'opp_stock:liste_produits' %}">← Tous les produits</a>
+  </div>
+
+  <div class="card">
+    {% if produits %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Catégorie</th>
+              <th class="num">Quantité</th>
+              <th class="num">Seuil</th>
+              <th>Statut</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for produit in produits %}
+              <tr>
+                <td><strong>{{ produit.nom }}</strong></td>
+                <td>{{ produit.categorie.nom }}</td>
+                <td class="num"><strong>{{ produit.quantite }}</strong></td>
+                <td class="num">{{ produit.seuil_alerte }}</td>
+                <td><span class="badge badge-alert">À réapprovisionner</span></td>
+                <td class="actions">
+                  <a class="btn btn-sm btn-primary" href="{% url 'opp_stock:modifier_produit' produit.pk %}">Réapprovisionner</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty">
+        <strong>Tout va bien 👍</strong>
+        Aucun produit n'est actuellement sous son seuil d'alerte.
+        <a href="{% url 'opp_stock:liste_produits' %}">Retour à la liste des produits</a>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
