@@ -37,7 +37,8 @@ class Produit(models.Model):
 
     @property
     def est_en_alerte(self):
-        return self.quantite <= self.seuil_alerte
+        """Vrai si le stock est strictement inférieur au seuil d'alerte."""
+        return self.quantite < self.seuil_alerte
 
     def clean(self):
         if self.nom and len(self.nom.strip()) < 2:
