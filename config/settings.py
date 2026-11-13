@@ -155,6 +155,10 @@ if not DEBUG:
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Après connexion/déconnexion, revenir sur l'application (évite le 404 /accounts/profile/).
+LOGIN_REDIRECT_URL = 'opp_stock:liste_produits'
+LOGOUT_REDIRECT_URL = 'opp_stock:liste_produits'
+
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
