@@ -2,8 +2,7 @@
 
 Application web de gestion de stock réalisée avec Django dans le cadre du TP collaboratif GitHub et déploiement Django.
 
-> **État du projet :** ce README présente le périmètre demandé. Les commandes, fonctionnalités, versions et URL de déploiement devront être confirmées
-> avec le code final du groupe.
+> **État du projet :** ce README présente le périmètre demandé. Les commandes, fonctionnalités, versions et URL de déploiement.
 
 ## Objectif
 
@@ -17,12 +16,14 @@ Gérer des produits classés par catégorie et repérer ceux dont le stock passe
 - Signaler les produits dont la quantité est inférieure au seuil d’alerte.
 - Administrer les données depuis Django Admin, si cette fonctionnalité est activée dans le projet.
 
-## Modèles prévus
+## Modèles de données
 
-- **Categorie** : nom et autres champs retenus par l’équipe.
-- **Produit** : nom, quantité, seuil d’alerte et catégorie associée.
+- **Categorie** : nom et description.
+- **Produit** : nom, quantité en stock, seuil d’alerte et catégorie associée.
 
-Les noms des champs ci-dessus sont à harmoniser avec les modèles réellement implémentés.
+Exemples de catégories : Boissons, Céréales et Hygiène.
+
+Exemples de produits : eau minérale 1,5 L, farine de blé 1 kg, jus d’orange 1 L, maïs concassé 1 kg, riz parfumé 5 kg et savon de Marseille.
 
 ## Prérequis
 
@@ -80,17 +81,17 @@ Parcours à vérifier : création d’un produit, affichage de la liste, filtre 
 
 | Membre | Responsabilité prévue | Branche / Pull Request |
 |---|---|---|
-| Djean-bi Goore  | Coordination, dépôt et intégration | À compléter |
-| Onikoyamou Moïse  | Modèles, ORM, migrations et administration | À compléter |
-| Kouakou Christ Evrard| Vues, URLs et logique métier | À compléter |
-| Kone Mohamed Dia| Templates et formulaires | À compléter |
-| Kouassi Mihinsa Jean-Loïs| Tests, README et déploiement | 
+| Djean-bi Goore | Coordination, dépôt et intégration | coordination |
+| Onikoyamou Moïse | Modèles, ORM, migrations et administration | models |
+| Kouakou Christ Evrard | Vues, URLs et logique métier | views |
+| Kone Mohamed Dia | Templates et formulaires | templates |
+| Kouassi Mihinsa Jean-Loïs | Tests, README et déploiement | deploiement |
 
 
 ## Déploiement
 
-- **Hébergeur :** à confirmer
-- **URL publique :** à ajouter après le déploiement
+- Hébergeur :PythonAnywhere
+- URL publique : https://bigo.pythonanywhere.com
 - Les paramètres sensibles, notamment `SECRET_KEY`, doivent être fournis par variables d’environnement et ne doivent pas être commités.
 - En production, configurer notamment `DEBUG=False`, `ALLOWED_HOSTS`, les fichiers statiques et la base de données selon l’hébergeur.
 
